@@ -405,7 +405,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2022-01-13
+                    2022-01-25
                 </div>
                 
 
@@ -429,116 +429,116 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><h4 id="导入模块"><a href="#导入模块" class="headerlink" title="导入模块"></a>导入模块</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python">import tensorflow as tf
-from sklearn import datasets
-from matplotlib import pyplot as plt
-import numpy as np<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+                <h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><h4 id="导入模块"><a href="#导入模块" class="headerlink" title="导入模块"></a>导入模块</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
+<span class="token keyword">from</span> sklearn <span class="token keyword">import</span> datasets
+<span class="token keyword">from</span> matplotlib <span class="token keyword">import</span> pyplot <span class="token keyword">as</span> plt
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><strong>导入数据，分别为输入特征和标签</strong></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">x_data &#x3D; datasets.load_iris().data
-y_data &#x3D; datasets.load_iris().target*****<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">x_data <span class="token operator">=</span> datasets<span class="token punctuation">.</span>load_iris<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>data
+y_data <span class="token operator">=</span> datasets<span class="token punctuation">.</span>load_iris<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>target<span class="token operator">**</span><span class="token operator">**</span><span class="token operator">*</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p><em><strong>随机打乱数据（因为原始数据是顺序的，顺序不打乱会影响准确率）</strong></em></p>
 <p><em><strong>seed: 随机数种子，是一个整数，当设置之后，每次生成的随机数都一样</strong></em></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">np.random.seed(116)  # 使用相同的seed，保证输入特征和标签一一对应
-np.random.shuffle(x_data)
-np.random.seed(116)
-np.random.shuffle(y_data)
-tf.random.set_seed(116)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">116</span><span class="token punctuation">)</span>  <span class="token comment"># 使用相同的seed，保证输入特征和标签一一对应</span>
+np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>shuffle<span class="token punctuation">(</span>x_data<span class="token punctuation">)</span>
+np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>seed<span class="token punctuation">(</span><span class="token number">116</span><span class="token punctuation">)</span>
+np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>shuffle<span class="token punctuation">(</span>y_data<span class="token punctuation">)</span>
+tf<span class="token punctuation">.</span>random<span class="token punctuation">.</span>set_seed<span class="token punctuation">(</span><span class="token number">116</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 
 
 <p><em><strong>将打乱后的数据集分割为训练集和测试集，训练集为前120行，测试集为后30行</strong></em></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">x_train &#x3D; x_data[:-30]
-y_train &#x3D; y_data[:-30]
-x_test &#x3D; x_data[-30:]
-y_test &#x3D; y_data[-30:]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">x_train <span class="token operator">=</span> x_data<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">30</span><span class="token punctuation">]</span>
+y_train <span class="token operator">=</span> y_data<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token operator">-</span><span class="token number">30</span><span class="token punctuation">]</span>
+x_test <span class="token operator">=</span> x_data<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">30</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+y_test <span class="token operator">=</span> y_data<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">30</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 
 
 <p><em><strong>转换x的数据类型，否则后面矩阵相乘时会因数据类型不一致报错</strong></em></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">x_train &#x3D; tf.cast(x_train, tf.float32)
-x_test &#x3D; tf.cast(x_test, tf.float32)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">x_train <span class="token operator">=</span> tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+x_test <span class="token operator">=</span> tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>x_test<span class="token punctuation">,</span> tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 
 
 <p><em><strong>from_tensor_slices函数使输入特征和标签值一一对应。（把数据集分批次，每个批次batch组数据）</strong></em></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">train_db &#x3D; tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32)
-test_db &#x3D; tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">train_db <span class="token operator">=</span> tf<span class="token punctuation">.</span>data<span class="token punctuation">.</span>Dataset<span class="token punctuation">.</span>from_tensor_slices<span class="token punctuation">(</span><span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>batch<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span>
+test_db <span class="token operator">=</span> tf<span class="token punctuation">.</span>data<span class="token punctuation">.</span>Dataset<span class="token punctuation">.</span>from_tensor_slices<span class="token punctuation">(</span><span class="token punctuation">(</span>x_test<span class="token punctuation">,</span> y_test<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>batch<span class="token punctuation">(</span><span class="token number">32</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 
 
 <p><em><strong>生成神经网络的参数，4个输入特征故，输入层为4个输入节点；因为3分类，故输出层为3个神经元</strong></em></p>
 <p><em><strong>用tf.Variable()标记参数可训练</strong></em></p>
 <p><em><strong>使用seed使每次生成的随机数相同</strong></em></p>
-<pre class="line-numbers language-py" data-language="py"><code class="language-py">w1 &#x3D; tf.Variable(tf.random.truncated_normal([4, 3], stddev&#x3D;0.1, seed&#x3D;1))
-b1 &#x3D; tf.Variable(tf.random.truncated_normal([3], stddev&#x3D;0.1, seed&#x3D;1))<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-py" data-language="py"><code class="language-py">w1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>random<span class="token punctuation">.</span>truncated_normal<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span> stddev<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+b1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>random<span class="token punctuation">.</span>truncated_normal<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">,</span> stddev<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">,</span> seed<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">lr &#x3D; 0.01  # 学习率为0.01  
-train_loss_results &#x3D; []  # 将每轮的loss记录在此列表中，为后续画loss曲线提供数据
-test_acc &#x3D; []  # 将每轮的acc记录在此列表中，为后续画acc曲线提供数据
-epoch &#x3D; 5000  # 循环5000轮 
-loss_all &#x3D; 0  # 每轮分4个step，loss_all记录四个step生成的4个loss的和<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">lr <span class="token operator">=</span> <span class="token number">0.01</span>  <span class="token comment"># 学习率为0.01  </span>
+train_loss_results <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>  <span class="token comment"># 将每轮的loss记录在此列表中，为后续画loss曲线提供数据</span>
+test_acc <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>  <span class="token comment"># 将每轮的acc记录在此列表中，为后续画acc曲线提供数据</span>
+epoch <span class="token operator">=</span> <span class="token number">5000</span>  <span class="token comment"># 循环5000轮 </span>
+loss_all <span class="token operator">=</span> <span class="token number">0</span>  <span class="token comment"># 每轮分4个step，loss_all记录四个step生成的4个loss的和</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><em><strong>注意： 我这里面lr(学习率)设置的有点小 根据梯度下降法来说这个模型不需要设置这么小，同样 epoch循环论次 我也设置较大 这两个参数根据实际情况设置</strong></em></p>
 <hr>
-<h2 id="训练部分"><a href="#训练部分" class="headerlink" title="训练部分"></a>训练部分</h2><pre class="line-numbers language-python" data-language="python"><code class="language-python">for epoch in range(epoch):  #数据集级别的循环，每个epoch循环一次数据集
-    for step, (x_train, y_train) in enumerate(train_db):  #batch级别的循环 ，每个step循环一个batch
-        with tf.GradientTape() as tape:  # with结构记录梯度信息
-            y &#x3D; tf.matmul(x_train, w1) + b1  # 神经网络乘加运算
-            y &#x3D; tf.nn.softmax(y)  # 使输出y符合概率分布（此操作后与独热码同量级，可相减求loss）
-            y_ &#x3D; tf.one_hot(y_train, depth&#x3D;3)  # 将标签值转换为独热码格式，方便计算loss和accuracy
-            loss &#x3D; tf.reduce_mean(tf.square(y_ - y))  # 采用均方误差损失函数mse &#x3D; mean(sum(y-out)^2)
-            loss_all +&#x3D; loss.numpy()  # 将每个step计算出的loss累加，为后续求loss平均值提供数据，这样计算的loss更准确
-        # 计算loss对各个参数的梯度
-        grads &#x3D; tape.gradient(loss, [w1, b1])
+<h2 id="训练部分"><a href="#训练部分" class="headerlink" title="训练部分"></a>训练部分</h2><pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">for</span> epoch <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>epoch<span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment">#数据集级别的循环，每个epoch循环一次数据集</span>
+    <span class="token keyword">for</span> step<span class="token punctuation">,</span> <span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span> <span class="token keyword">in</span> <span class="token builtin">enumerate</span><span class="token punctuation">(</span>train_db<span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment">#batch级别的循环 ，每个step循环一个batch</span>
+        <span class="token keyword">with</span> tf<span class="token punctuation">.</span>GradientTape<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> tape<span class="token punctuation">:</span>  <span class="token comment"># with结构记录梯度信息</span>
+            y <span class="token operator">=</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> w1<span class="token punctuation">)</span> <span class="token operator">+</span> b1  <span class="token comment"># 神经网络乘加运算</span>
+            y <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>y<span class="token punctuation">)</span>  <span class="token comment"># 使输出y符合概率分布（此操作后与独热码同量级，可相减求loss）</span>
+            y_ <span class="token operator">=</span> tf<span class="token punctuation">.</span>one_hot<span class="token punctuation">(</span>y_train<span class="token punctuation">,</span> depth<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">)</span>  <span class="token comment"># 将标签值转换为独热码格式，方便计算loss和accuracy</span>
+            loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y_ <span class="token operator">-</span> y<span class="token punctuation">)</span><span class="token punctuation">)</span>  <span class="token comment"># 采用均方误差损失函数mse = mean(sum(y-out)^2)</span>
+            loss_all <span class="token operator">+=</span> loss<span class="token punctuation">.</span>numpy<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment"># 将每个step计算出的loss累加，为后续求loss平均值提供数据，这样计算的loss更准确</span>
+        <span class="token comment"># 计算loss对各个参数的梯度</span>
+        grads <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss<span class="token punctuation">,</span> <span class="token punctuation">[</span>w1<span class="token punctuation">,</span> b1<span class="token punctuation">]</span><span class="token punctuation">)</span>
 
-        # 实现梯度更新 w1 &#x3D; w1 - lr * w1_grad    b &#x3D; b - lr * b_grad
-        w1.assign_sub(lr * grads[0])  # 参数w1自更新
-        b1.assign_sub(lr * grads[1])  # 参数b自更新
+        <span class="token comment"># 实现梯度更新 w1 = w1 - lr * w1_grad    b = b - lr * b_grad</span>
+        w1<span class="token punctuation">.</span>assign_sub<span class="token punctuation">(</span>lr <span class="token operator">*</span> grads<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment"># 参数w1自更新</span>
+        b1<span class="token punctuation">.</span>assign_sub<span class="token punctuation">(</span>lr <span class="token operator">*</span> grads<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>  <span class="token comment"># 参数b自更新</span>
 
-    # 每个epoch，打印loss信息
-    print(&quot;Epoch &#123;&#125;, loss: &#123;&#125;&quot;.format(epoch, loss_all&#x2F;4))
-    train_loss_results.append(loss_all &#x2F; 4)  # 将4个step的loss求平均记录在此变量中
-    loss_all &#x3D; 0  # loss_all归零，为记录下一个epoch的lo<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+    <span class="token comment"># 每个epoch，打印loss信息</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Epoch &#123;&#125;, loss: &#123;&#125;"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>epoch<span class="token punctuation">,</span> loss_all<span class="token operator">/</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    train_loss_results<span class="token punctuation">.</span>append<span class="token punctuation">(</span>loss_all <span class="token operator">/</span> <span class="token number">4</span><span class="token punctuation">)</span>  <span class="token comment"># 将4个step的loss求平均记录在此变量中</span>
+    loss_all <span class="token operator">=</span> <span class="token number">0</span>  <span class="token comment"># loss_all归零，为记录下一个epoch的lo</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h2 id="测试部分"><a href="#测试部分" class="headerlink" title="测试部分"></a>测试部分</h2><p><em><strong>total_correct为预测对的样本个数, total_number为测试的总样本数，将这两个变量都初始化为0</strong></em></p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">total_correct, total_number &#x3D; 0, 0<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python">total_correct<span class="token punctuation">,</span> total_number <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<pre class="line-numbers language-python" data-language="python"><code class="language-python">for x_test, y_test in test_db:
-    # 使用更新后的参数进行预测
-    y &#x3D; tf.matmul(x_test, w1) + b1
-    y &#x3D; tf.nn.softmax(y)
-    pred &#x3D; tf.argmax(y, axis&#x3D;1)  # 返回y中最大值的索引，即预测的分类
-    # 将pred转换为y_test的数据类型
-    pred &#x3D; tf.cast(pred, dtype&#x3D;y_test.dtype)
-    # 若分类正确，则correct&#x3D;1，否则为0，将bool型的结果转换为int型
-    correct &#x3D; tf.cast(tf.equal(pred, y_test), dtype&#x3D;tf.int32)
-    # 将每个batch的correct数加起来
-    correct &#x3D; tf.reduce_sum(correct)
-    # 将所有batch中的correct数加起来
-    total_correct +&#x3D; int(correct)
-    # total_number为测试的总样本数，也就是x_test的行数，shape[0]返回变量的行数
-    total_number +&#x3D; x_test.shape[0]
-# 总的准确率等于total_correct&#x2F;total_number
-acc &#x3D; total_correct &#x2F; total_number
-test_acc.append(acc)
-print(&quot;Test_acc:&quot;, acc)
-print(&quot;--------------------------&quot;)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">for</span> x_test<span class="token punctuation">,</span> y_test <span class="token keyword">in</span> test_db<span class="token punctuation">:</span>
+    <span class="token comment"># 使用更新后的参数进行预测</span>
+    y <span class="token operator">=</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>x_test<span class="token punctuation">,</span> w1<span class="token punctuation">)</span> <span class="token operator">+</span> b1
+    y <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+    pred <span class="token operator">=</span> tf<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>y<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>  <span class="token comment"># 返回y中最大值的索引，即预测的分类</span>
+    <span class="token comment"># 将pred转换为y_test的数据类型</span>
+    pred <span class="token operator">=</span> tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>pred<span class="token punctuation">,</span> dtype<span class="token operator">=</span>y_test<span class="token punctuation">.</span>dtype<span class="token punctuation">)</span>
+    <span class="token comment"># 若分类正确，则correct=1，否则为0，将bool型的结果转换为int型</span>
+    correct <span class="token operator">=</span> tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>equal<span class="token punctuation">(</span>pred<span class="token punctuation">,</span> y_test<span class="token punctuation">)</span><span class="token punctuation">,</span> dtype<span class="token operator">=</span>tf<span class="token punctuation">.</span>int32<span class="token punctuation">)</span>
+    <span class="token comment"># 将每个batch的correct数加起来</span>
+    correct <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_sum<span class="token punctuation">(</span>correct<span class="token punctuation">)</span>
+    <span class="token comment"># 将所有batch中的correct数加起来</span>
+    total_correct <span class="token operator">+=</span> <span class="token builtin">int</span><span class="token punctuation">(</span>correct<span class="token punctuation">)</span>
+    <span class="token comment"># total_number为测试的总样本数，也就是x_test的行数，shape[0]返回变量的行数</span>
+    total_number <span class="token operator">+=</span> x_test<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+<span class="token comment"># 总的准确率等于total_correct/total_number</span>
+acc <span class="token operator">=</span> total_correct <span class="token operator">/</span> total_number
+test_acc<span class="token punctuation">.</span>append<span class="token punctuation">(</span>acc<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Test_acc:"</span><span class="token punctuation">,</span> acc<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"--------------------------"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="绘制曲线"><a href="#绘制曲线" class="headerlink" title="绘制曲线"></a>绘制曲线</h2><h4 id="绘制-loss曲线"><a href="#绘制-loss曲线" class="headerlink" title="绘制 loss曲线"></a>绘制 loss曲线</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python">plt.title(&#39;Loss Function Curve&#39;)  # 图片标题
-plt.xlabel(&#39;Epoch&#39;)  # x轴变量名称
-plt.ylabel(&#39;Loss&#39;)  # y轴变量名称
-plt.plot(train_loss_results, label&#x3D;&quot;$Loss$&quot;)  # 逐点画出trian_loss_results值并连线，连线图标是Loss
-plt.legend()  # 画出曲线图标
-plt.show()  # 画出图像<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="绘制曲线"><a href="#绘制曲线" class="headerlink" title="绘制曲线"></a>绘制曲线</h2><h4 id="绘制-loss曲线"><a href="#绘制-loss曲线" class="headerlink" title="绘制 loss曲线"></a>绘制 loss曲线</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python">plt<span class="token punctuation">.</span>title<span class="token punctuation">(</span><span class="token string">'Loss Function Curve'</span><span class="token punctuation">)</span>  <span class="token comment"># 图片标题</span>
+plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">'Epoch'</span><span class="token punctuation">)</span>  <span class="token comment"># x轴变量名称</span>
+plt<span class="token punctuation">.</span>ylabel<span class="token punctuation">(</span><span class="token string">'Loss'</span><span class="token punctuation">)</span>  <span class="token comment"># y轴变量名称</span>
+plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>train_loss_results<span class="token punctuation">,</span> label<span class="token operator">=</span><span class="token string">"$Loss$"</span><span class="token punctuation">)</span>  <span class="token comment"># 逐点画出trian_loss_results值并连线，连线图标是Loss</span>
+plt<span class="token punctuation">.</span>legend<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment"># 画出曲线图标</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment"># 画出图像</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h4 id="绘制-Accuracy-曲线"><a href="#绘制-Accuracy-曲线" class="headerlink" title="绘制 Accuracy 曲线"></a>绘制 Accuracy 曲线</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python">plt.title(&#39;Acc Curve&#39;)  # 图片标题
-plt.xlabel(&#39;Epoch&#39;)  # x轴变量名称
-plt.ylabel(&#39;Acc&#39;)  # y轴变量名称
-plt.plot(test_acc, label&#x3D;&quot;$Accuracy$&quot;)  # 逐点画出test_acc值并连线，连线图标是Accuracy
-plt.legend()
-plt.show()
+<h4 id="绘制-Accuracy-曲线"><a href="#绘制-Accuracy-曲线" class="headerlink" title="绘制 Accuracy 曲线"></a>绘制 Accuracy 曲线</h4><pre class="line-numbers language-python" data-language="python"><code class="language-python">plt<span class="token punctuation">.</span>title<span class="token punctuation">(</span><span class="token string">'Acc Curve'</span><span class="token punctuation">)</span>  <span class="token comment"># 图片标题</span>
+plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">'Epoch'</span><span class="token punctuation">)</span>  <span class="token comment"># x轴变量名称</span>
+plt<span class="token punctuation">.</span>ylabel<span class="token punctuation">(</span><span class="token string">'Acc'</span><span class="token punctuation">)</span>  <span class="token comment"># y轴变量名称</span>
+plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>test_acc<span class="token punctuation">,</span> label<span class="token operator">=</span><span class="token string">"$Accuracy$"</span><span class="token punctuation">)</span>  <span class="token comment"># 逐点画出test_acc值并连线，连线图标是Accuracy</span>
+plt<span class="token punctuation">.</span>legend<span class="token punctuation">(</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 
@@ -573,7 +573,7 @@ plt.show()
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="http://therationalpeople.com/2022/01/13/hello-world/">http://therationalpeople.com/2022/01/13/hello-world/</a>
+                    <a href="http://therationalpeople.com/2022/01/25/hello-world/">http://therationalpeople.com/2022/01/25/hello-world/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -799,7 +799,7 @@ plt.show()
                 <i class="far fa-dot-circle"></i>&nbsp;本篇
             </div>
             <div class="card">
-                <a href="/2022/01/13/hello-world/">
+                <a href="/2022/01/25/hello-world/">
                     <div class="card-image">
                         
                         
@@ -816,7 +816,7 @@ plt.show()
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2022-01-13
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-01-25
                             </span>
                         <span class="publish-author">
                             
@@ -861,7 +861,7 @@ plt.show()
                 本篇&nbsp;<i class="far fa-dot-circle"></i>
             </div>
             <div class="card">
-                <a href="/2022/01/13/hello-world/">
+                <a href="/2022/01/25/hello-world/">
                     <div class="card-image">
                         
                         
@@ -878,7 +878,7 @@ plt.show()
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2022-01-13
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-01-25
                             </span>
                         <span class="publish-author">
                             
