@@ -6,7 +6,7 @@
   <link href="https://juststare.github.io/atom.xml" rel="self"/>
   
   <link href="https://juststare.github.io/"/>
-  <updated>2022-10-03T05:29:16.923Z</updated>
+  <updated>2022-10-03T08:17:37.016Z</updated>
   <id>https://juststare.github.io/</id>
   
   <author>
@@ -15,6 +15,85 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>图片提取</title>
+    <link href="https://juststare.github.io/posts/undefined.html"/>
+    <id>https://juststare.github.io/posts/undefined.html</id>
+    <published>2022-10-03T08:16:25.000Z</published>
+    <updated>2022-10-03T08:17:37.016Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="../images/image-20221003152451996.png" alt="image-20221003152451996"></p><h3 id="关于yolo中图像的提取"><a href="#关于yolo中图像的提取" class="headerlink" title="关于yolo中图像的提取"></a>关于yolo中图像的提取</h3><p>1 、 我们可以发现 由于使用了 pytorch 所以把 img都变成了 tensor类型</p><p><img src="../images/image-20221003152606759.png" alt="image-20221003152606759"></p><p>在第一次 提取的时候 可以发现 h =  330 w = 494 </p><p>这是一个长方形 明显不 符合规格 所以 采取了填充 <img src="../images/无标题.png" alt="无标题"></p><p> 也就是把他pading一下 变成一个正方形 让多余的地方是 0   不影响特征提取</p><h3 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h3><p><img src="../images/image-20221003153543945.png" alt="image-20221003153543945"></p><p>明显标签和图片是一致的</p><p><img src="../images/image-20221003154109297.png" alt="image-20221003154109297"></p><p>明显  label是一个txt 所以要 用numpy来 loadtxt读取</p><p>但是 由于用的torch 于是又用 formnumpy函数 转化为tensor</p><p>什么究极套娃<img src="../images/image-20221003154413329.png" alt=""></p><p>然后 把坐标 变成padding之后的坐标 也就是变成正方形之后的</p><p><img src="../images/image-20221003154717902.png" alt="image-20221003154717902"></p><p>这 是图片增强</p><p>就是通过变化图像来增加 图片数量 增加 特征提取的数量</p><p>貌似 coco数据集很大 应该不需要进行图像增强了</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;../images/image-20221003152451996.png&quot; alt=&quot;image-20221003152451996&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;关于yolo中图像的提取&quot;&gt;&lt;a href=&quot;#关于yolo中图像的提取&quot; class=&quot;</summary>
+      
+    
+    
+    
+    
+    <category term="yolov3" scheme="https://juststare.github.io/tags/yolov3/"/>
+    
+    <category term="torch" scheme="https://juststare.github.io/tags/torch/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>yolov3 框架第一步 三合一 con</title>
+    <link href="https://juststare.github.io/posts/ad77980a.html"/>
+    <id>https://juststare.github.io/posts/ad77980a.html</id>
+    <published>2022-10-03T08:14:28.000Z</published>
+    <updated>2022-10-03T08:15:37.056Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="../images/image-20221003155141803.png" alt="image-20221003155141803"></p><p>这是读配置文件 </p><p><img src="../images/image-20221003155331432.png" alt="image-20221003155331432"></p><p>这是 进行走一遍</p><h3 id="1"><a href="#1" class="headerlink" title="1"></a>1<img src="../images/image-20221003155649102.png" alt="image-20221003155649102"></h3><p>搭建网络结构</p><p>nn.moduleList() 是按顺序搭建模块</p><p><img src="../images/image-20221003155744505.png" alt="image-20221003155744505"></p><p>哎呀这不卷积吗</p><p>这 卷积核大小 什么步长  padding relu的计算方法 都在里面呢</p><p><img src="../images/image-20221003155920086.png" alt="image-20221003155920086"></p><p>这玩应是3合1 卷积 batch relu  是个组合</p><p><img src="../images/image-20221003160201628.png" alt="image-20221003160201628"></p><p>配置卷积</p><p>然后就是 做 归一化 也就是bn（batch_normalize）</p><p><img src="../images/image-20221003160325246.png" alt="image-20221003160325246"></p><p>直接加进去了</p><p>还差个relu  是把负的变成0</p><p>把激活函数加进去</p><p><img src="../images/image-20221003160403052.png" alt="image-20221003160403052"></p><p><img src="../images/image-20221003160701990.png" alt="image-20221003160701990"></p><p>完成了第一步</p><p>module序列</p><p><img src="../images/image-20221003160731178.png" alt="image-20221003160731178"></p><p>就这步</p><h3 id="2"><a href="#2" class="headerlink" title="2"></a>2</h3>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;../images/image-20221003155141803.png&quot; alt=&quot;image-20221003155141803&quot;&gt;&lt;/p&gt;
+&lt;p&gt;这是读配置文件 &lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/image-20221003</summary>
+      
+    
+    
+    
+    
+    <category term="yolov3" scheme="https://juststare.github.io/tags/yolov3/"/>
+    
+    <category term="con" scheme="https://juststare.github.io/tags/con/"/>
+    
+    <category term="torch" scheme="https://juststare.github.io/tags/torch/"/>
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="https://juststare.github.io/posts/0.html"/>
+    <id>https://juststare.github.io/posts/0.html</id>
+    <published>2022-10-03T07:24:41.581Z</published>
+    <updated>2022-10-03T08:16:57.222Z</updated>
+    
+    <content type="html"><![CDATA[<pre class="line-numbers language-none"><code class="language-none">stitle: yolov3 -01 关于图像的提取tags:  - 图像提取  - PyTorch  - yolov3cover:  &quot;..&#x2F;images&#x2F;blog-01.jpg&quot;abbrlink: &#39;2022 10 3&#39;date:<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre><h1 id=""><a href="#" class="headerlink" title=" "></a> </h1><p><img src="../images/image-20221003152451996.png" alt="image-20221003152451996"></p><h3 id="关于yolo中图像的提取"><a href="#关于yolo中图像的提取" class="headerlink" title="关于yolo中图像的提取"></a>关于yolo中图像的提取</h3><p>1 、 我们可以发现 由于使用了 pytorch 所以把 img都变成了 tensor类型</p><p><img src="../images/image-20221003152606759.png" alt="image-20221003152606759"></p><p>在第一次 提取的时候 可以发现 h =  330 w = 494 </p><p>这是一个长方形 明显不 符合规格 所以 采取了填充 <img src="../images/无标题.png" alt="无标题"></p><p> 也就是把他pading一下 变成一个正方形 让多余的地方是 0   不影响特征提取</p><h3 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h3><p><img src="../images/image-20221003153543945.png" alt="image-20221003153543945"></p><p>明显标签和图片是一致的</p><p><img src="../images/image-20221003154109297.png" alt="image-20221003154109297"></p><p>明显  label是一个txt 所以要 用numpy来 loadtxt读取</p><p>但是 由于用的torch 于是又用 formnumpy函数 转化为tensor</p><p>什么究极套娃<img src="../images/image-20221003154413329.png" alt=""></p><p>然后 把坐标 变成padding之后的坐标 也就是变成正方形之后的</p><p><img src="../images/image-20221003154717902.png" alt="image-20221003154717902"></p><p>这 是图片增强</p><p>就是通过变化图像来增加 图片数量 增加 特征提取的数量</p><p>貌似 coco数据集很大 应该不需要进行图像增强了</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;pre class=&quot;line-numbers language-none&quot;&gt;&lt;code class=&quot;language-none&quot;&gt;stitle: yolov3 -01 关于图像的提取
+tags:
+
+  - 图像提取
+  - PyTorch
+  - yolov3
+cover:</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title></title>
