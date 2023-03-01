@@ -1,0 +1,411 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>默克尔树 | 猗狛</title><meta name="keywords" content="BTC,GO"><meta name="author" content="猗狛"><meta name="copyright" content="猗狛"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="默克尔树（Merkle tree）是一种哈希树的结构常用于数据完整性验证和快速数据检索。在比特币中，每个区块的交易记录就是通过默克尔树组织起来的。在本文中，我们将使用Go语言实现一个简单的默克尔树。 首先，我们需要定义一个数据结构来表示默克尔树节点： type MerkleNode struct &amp;#123;     Left  *MerkleNode     Right *MerkleNode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="默克尔树">
+<meta property="og:url" content="https://juststare.github.io/posts/vash9123.html">
+<meta property="og:site_name" content="猗狛">
+<meta property="og:description" content="默克尔树（Merkle tree）是一种哈希树的结构常用于数据完整性验证和快速数据检索。在比特币中，每个区块的交易记录就是通过默克尔树组织起来的。在本文中，我们将使用Go语言实现一个简单的默克尔树。 首先，我们需要定义一个数据结构来表示默克尔树节点： type MerkleNode struct &amp;#123;     Left  *MerkleNode     Right *MerkleNode">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://juststare.github.io/images/blog-09.gif">
+<meta property="article:published_time" content="2022-11-04T04:19:23.000Z">
+<meta property="article:modified_time" content="2023-02-25T15:09:08.748Z">
+<meta property="article:author" content="猗狛">
+<meta property="article:tag" content="BTC">
+<meta property="article:tag" content="GO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://juststare.github.io/images/blog-09.gif"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://juststare.github.io/posts/vash9123"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '默克尔树',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-02-25 23:09:08'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css" media="defer" onload="this.media='all'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.css" /><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/font-awesome-animation.min.css" media="defer" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/tag_plugins.css" media="defer" onload="this.media='all'"><script src="https://cdn.cbd.int/hexo-butterfly-tag-plugins-plus@latest/lib/assets/carousel-touch.js"></script><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="猗狛" type="application/atom+xml">
+</head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/2.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/./images/blog-09.gif')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">猗狛</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">默克尔树</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-04T04:19:23.000Z" title="发表于 2022-11-04 12:19:23">2022-11-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-02-25T15:09:08.748Z" title="更新于 2023-02-25 23:09:08">2023-02-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GO/">GO</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GO/%E5%8C%BA%E5%9D%97%E9%93%BE/">区块链</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="默克尔树"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="默克尔树（Merkle-tree）是一种哈希树的结构"><a href="#默克尔树（Merkle-tree）是一种哈希树的结构" class="headerlink" title="默克尔树（Merkle tree）是一种哈希树的结构"></a>默克尔树（Merkle tree）是一种哈希树的结构</h1><p>常用于数据完整性验证和快速数据检索。在比特币中，每个区块的交易记录就是通过默克尔树组织起来的。在本文中，我们将使用Go语言实现一个简单的默克尔树。</p>
+<p>首先，我们需要定义一个数据结构来表示默克尔树节点：</p>
+<pre class="line-numbers language-none"><code class="language-none">type MerkleNode struct &#123;
+    Left  *MerkleNode
+    Right *MerkleNode
+    Data  []byte
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>MerkleNode包含三个字段：Left和Right表示左右子节点，Data表示节点的数据。对于叶子节点，Data为交易记录的哈希值；对于非叶子节点，Data为左右子节点的哈希值的拼接。</p>
+<p>接下来，我们实现一个函数来创建默克尔树节点：</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">NewMerkleNode</span><span class="token punctuation">(</span>left<span class="token punctuation">,</span> right <span class="token operator">*</span>MerkleNode<span class="token punctuation">,</span> data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token operator">*</span>MerkleNode <span class="token punctuation">&#123;</span>
+    node <span class="token operator">:=</span> MerkleNode<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">if</span> left <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token operator">&amp;&amp;</span> right <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+        node<span class="token punctuation">.</span>Data <span class="token operator">=</span> data
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        prevHashes <span class="token operator">:=</span> <span class="token function">append</span><span class="token punctuation">(</span>left<span class="token punctuation">.</span>Data<span class="token punctuation">,</span> right<span class="token punctuation">.</span>Data<span class="token operator">...</span><span class="token punctuation">)</span>
+        hash <span class="token operator">:=</span> sha256<span class="token punctuation">.</span><span class="token function">Sum256</span><span class="token punctuation">(</span>prevHashes<span class="token punctuation">)</span>
+        node<span class="token punctuation">.</span>Data <span class="token operator">=</span> hash<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+    <span class="token punctuation">&#125;</span>
+
+    node<span class="token punctuation">.</span>Left <span class="token operator">=</span> left
+    node<span class="token punctuation">.</span>Right <span class="token operator">=</span> right
+
+    <span class="token keyword">return</span> <span class="token operator">&amp;</span>node
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>NewMerkleNode函数接受左右子节点和数据作为参数，返回一个新的默克尔树节点。如果左右子节点都为空，则该节点为叶子节点，Data为数据的哈希值；否则，该节点为非叶子节点，Data为左右子节点的哈希值的拼接。左右子节点和Data字段将分别设置为函数参数的值。</p>
+<p>最后，我们可以编写一个函数来生成默克尔树：</p>
+<pre class="line-numbers language-Go" data-language="Go"><code class="language-Go">func NewMerkleTree(data [][]byte) *MerkleNode &#123;
+    var nodes []*MerkleNode
+
+    for _, d :&#x3D; range data &#123;
+        node :&#x3D; NewMerkleNode(nil, nil, d)
+        nodes &#x3D; append(nodes, node)
+    &#125;
+
+    for len(nodes) &gt; 1 &#123;
+        var level []*MerkleNode
+
+        for len(nodes) &gt; 0 &#123;
+            left :&#x3D; nodes[0]
+            nodes &#x3D; nodes[1:]
+
+            var right *MerkleNode
+
+            if len(nodes) &gt; 0 &#123;
+                right &#x3D; nodes[0]
+                nodes &#x3D; nodes[1:]
+            &#125;
+
+            node :&#x3D; NewMerkleNode(left, right, nil)
+            level &#x3D; append(level, node)
+        &#125;
+
+        nodes &#x3D; level
+    &#125;
+
+    return nodes[0]
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>NewMerkleTree函数接受一个二维字节数组作为参数，其中每个字节数组表示一个交易记录的哈希值。该函数首先将每个哈希值转换为一个默克尔树节点，并将这些节点添加到一个节点列表中。然后，函数使用节点列表生成默克尔树，直到树的根节点生成为止。最后，函数返回树的根节点</p>
+<h2 id="下面我写完整代码："><a href="#下面我写完整代码：" class="headerlink" title="下面我写完整代码："></a>下面我写完整代码：</h2><p>在MerkleTree结构体中，我们定义了树的节点类型Node，它包含一个哈希值Hash和指向父节点和子节点的指针。另外，我们还定义了一个MerklePath结构体，它用于存储从叶子节点到根节点的路径。路径上的每个节点包含了它的兄弟节点的哈希值和它在父节点中的位置。</p>
+<p>接下来，我们实现树的构建和哈希计算方法。在buildTree方法中，我们首先将所有数据块转换为节点，并将它们添加到叶子节点列表中。然后，我们在循环中计算每个节点的哈希值，将它们添加到父节点的子节点列表中，并将父节点添加到父节点列表中。直到只剩下根节点为止。</p>
+<p>在calculateHash方法中，我们使用sha256哈希算法计算节点的哈希值。</p>
+<p>最后，我们实现了generateMerklePath方法，它用于生成指定叶子节点到根节点的路径。在循环中，我们依次获取节点的兄弟节点的哈希值，并将它们添加到路径上。直到到达根节点为止。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">"crypto/sha256"</span>
+	<span class="token string">"fmt"</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// MerkleTree 表示默克尔树结构</span>
+<span class="token keyword">type</span> MerkleTree <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	LeafNodes <span class="token punctuation">[</span><span class="token punctuation">]</span>Node <span class="token comment">// 叶子节点列表</span>
+	RootNode  <span class="token operator">*</span>Node  <span class="token comment">// 根节点</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// Node 表示默克尔树的一个节点</span>
+<span class="token keyword">type</span> Node <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	Hash       <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span> <span class="token comment">// 节点的哈希值</span>
+	LeftChild  <span class="token operator">*</span>Node  <span class="token comment">// 左子节点指针</span>
+	RightChild <span class="token operator">*</span>Node  <span class="token comment">// 右子节点指针</span>
+	Parent     <span class="token operator">*</span>Node  <span class="token comment">// 父节点指针</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// MerklePath 表示默克尔树中某个叶子节点的路径</span>
+<span class="token keyword">type</span> MerklePath <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	Hashes <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span> <span class="token comment">// 路径中涉及到的节点的哈希值列表</span>
+	Lefts  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">bool</span>   <span class="token comment">// 路径中每个节点是其父节点的左子节点还是右子节点的标记</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// NewMerkleTree 根据数据构建一个默克尔树</span>
+<span class="token keyword">func</span> <span class="token function">NewMerkleTree</span><span class="token punctuation">(</span>data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token operator">*</span>MerkleTree <span class="token punctuation">&#123;</span>
+	leafNodes <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span>Node<span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> i<span class="token punctuation">,</span> d <span class="token operator">:=</span> <span class="token keyword">range</span> data <span class="token punctuation">&#123;</span>
+		leafNodes<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> Node<span class="token punctuation">&#123;</span>
+			Hash<span class="token punctuation">:</span> <span class="token function">calculateHash</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// 计算数据的哈希值并赋值给叶子节点</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>MerkleTree<span class="token punctuation">&#123;</span>
+		LeafNodes<span class="token punctuation">:</span> leafNodes<span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// buildTree 构建默克尔树</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mt <span class="token operator">*</span>MerkleTree<span class="token punctuation">)</span> <span class="token function">buildTree</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	nodes <span class="token operator">:=</span> mt<span class="token punctuation">.</span>LeafNodes
+	<span class="token keyword">for</span> <span class="token function">len</span><span class="token punctuation">(</span>nodes<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">var</span> parentNodes <span class="token punctuation">[</span><span class="token punctuation">]</span>Node
+		<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>nodes<span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">+=</span> <span class="token number">2</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">var</span> left<span class="token punctuation">,</span> right <span class="token operator">*</span>Node
+			<span class="token keyword">if</span> i <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>nodes<span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span> <span class="token punctuation">&#123;</span>
+				left <span class="token operator">=</span> <span class="token operator">&amp;</span>nodes<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+				right <span class="token operator">=</span> <span class="token operator">&amp;</span>nodes<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span>
+			<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+				left <span class="token operator">=</span> <span class="token operator">&amp;</span>nodes<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+				right <span class="token operator">=</span> left
+			<span class="token punctuation">&#125;</span>
+			parent <span class="token operator">:=</span> Node<span class="token punctuation">&#123;</span>
+				LeftChild<span class="token punctuation">:</span>  left<span class="token punctuation">,</span>
+				RightChild<span class="token punctuation">:</span> right<span class="token punctuation">,</span>
+				Hash<span class="token punctuation">:</span>       <span class="token function">calculateHash</span><span class="token punctuation">(</span><span class="token function">append</span><span class="token punctuation">(</span>left<span class="token punctuation">.</span>Hash<span class="token punctuation">,</span> right<span class="token punctuation">.</span>Hash<span class="token operator">...</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// 计算左右子节点的哈希值并拼接为父节点的哈希值</span>
+			<span class="token punctuation">&#125;</span>
+			left<span class="token punctuation">.</span>Parent <span class="token operator">=</span> <span class="token operator">&amp;</span>parent
+			right<span class="token punctuation">.</span>Parent <span class="token operator">=</span> <span class="token operator">&amp;</span>parent
+			parentNodes <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>parentNodes<span class="token punctuation">,</span> parent<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		nodes <span class="token operator">=</span> parentNodes
+	<span class="token punctuation">&#125;</span>
+	mt<span class="token punctuation">.</span>RootNode <span class="token operator">=</span> <span class="token operator">&amp;</span>nodes<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token comment">// 最后剩下的节点就是根节点</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// calculateHash 计算哈希值</span>
+<span class="token keyword">func</span> <span class="token function">calculateHash</span><span class="token punctuation">(</span>data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span> <span class="token punctuation">&#123;</span>
+	h <span class="token operator">:=</span> sha256<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	h<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+	<span class="token keyword">return</span> h<span class="token punctuation">.</span><span class="token function">Sum</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mt <span class="token operator">*</span>MerkleTree<span class="token punctuation">)</span> <span class="token function">generateMerklePath</span><span class="token punctuation">(</span>index <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token operator">*</span>MerklePath <span class="token punctuation">&#123;</span>
+	node <span class="token operator">:=</span> <span class="token operator">&amp;</span>mt<span class="token punctuation">.</span>LeafNodes<span class="token punctuation">[</span>index<span class="token punctuation">]</span>
+	path <span class="token operator">:=</span> <span class="token operator">&amp;</span>MerklePath<span class="token punctuation">&#123;</span>
+		Hashes<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+		Lefts<span class="token punctuation">:</span>  <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">bool</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">for</span> node<span class="token punctuation">.</span>Parent <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		parent <span class="token operator">:=</span> node<span class="token punctuation">.</span>Parent
+		isLeftChild <span class="token operator">:=</span> parent<span class="token punctuation">.</span>LeftChild <span class="token operator">==</span> node
+		<span class="token keyword">if</span> isLeftChild <span class="token punctuation">&#123;</span>
+			path<span class="token punctuation">.</span>Lefts <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span>Lefts<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+			path<span class="token punctuation">.</span>Hashes <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span>Hashes<span class="token punctuation">,</span> parent<span class="token punctuation">.</span>RightChild<span class="token punctuation">.</span>Hash<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+			path<span class="token punctuation">.</span>Lefts <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span>Lefts<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span>
+			path<span class="token punctuation">.</span>Hashes <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span>Hashes<span class="token punctuation">,</span> parent<span class="token punctuation">.</span>LeftChild<span class="token punctuation">.</span>Hash<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		node <span class="token operator">=</span> parent
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> path
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	data <span class="token operator">:=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">&#123;</span>
+		<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span><span class="token string">"a"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span><span class="token string">"b"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span><span class="token string">"c"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span><span class="token string">"d"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+	tree <span class="token operator">:=</span> <span class="token function">NewMerkleTree</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+	tree<span class="token punctuation">.</span><span class="token function">buildTree</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"Merkle Root Hash: %x\n"</span><span class="token punctuation">,</span> tree<span class="token punctuation">.</span>RootNode<span class="token punctuation">.</span>Hash<span class="token punctuation">)</span>
+
+	path <span class="token operator">:=</span> tree<span class="token punctuation">.</span><span class="token function">generateMerklePath</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"Merkle Path for index %d:\n"</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span>Hashes<span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"Hash: %x, is left child: %t\n"</span><span class="token punctuation">,</span> path<span class="token punctuation">.</span>Hashes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> path<span class="token punctuation">.</span>Lefts<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://juststare.github.io">猗狛</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://juststare.github.io/posts/vash9123.html">https://juststare.github.io/posts/vash9123.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://juststare.github.io" target="_blank">猗狛</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/BTC/">BTC</a><a class="post-meta__tags" href="/tags/GO/">GO</a></div><div class="post_share"><div class="social-share" data-image="/./images/blog-09.gif" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/posts/asdj92sd.html"><img class="prev-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-10.gif" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">使用python和C混合编程实现远程控制(*****)</div></div></a></div><div class="next-post pull-right"><a href="/posts/9wf3as.html"><img class="next-cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-08.gif" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">P2PSH</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/9wf3as.html" title="P2PSH"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-08.gif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-29</div><div class="title">P2PSH</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/2.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">猗狛</div><div class="author-info__description">博客</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/JustStare"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%BB%98%E5%85%8B%E5%B0%94%E6%A0%91%EF%BC%88Merkle-tree%EF%BC%89%E6%98%AF%E4%B8%80%E7%A7%8D%E5%93%88%E5%B8%8C%E6%A0%91%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">默克尔树（Merkle tree）是一种哈希树的结构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E9%9D%A2%E6%88%91%E5%86%99%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">下面我写完整代码：</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/asdj92sd.html" title="使用python和C混合编程实现远程控制(*****)"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-10.gif" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用python和C混合编程实现远程控制(*****)"/></a><div class="content"><a class="title" href="/posts/asdj92sd.html" title="使用python和C混合编程实现远程控制(*****)">使用python和C混合编程实现远程控制(*****)</a><time datetime="2022-11-05T05:12:29.000Z" title="发表于 2022-11-05 13:12:29">2022-11-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/asdj92sd.html" title="使用python和C混合编程实现远程控制(*****)"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-10.gif" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用python和C混合编程实现远程控制(*****)"/></a><div class="content"><a class="title" href="/posts/asdj92sd.html" title="使用python和C混合编程实现远程控制(*****)">使用python和C混合编程实现远程控制(*****)</a><time datetime="2022-11-05T05:12:29.000Z" title="发表于 2022-11-05 13:12:29">2022-11-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/vash9123.html" title="默克尔树"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-09.gif" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="默克尔树"/></a><div class="content"><a class="title" href="/posts/vash9123.html" title="默克尔树">默克尔树</a><time datetime="2022-11-04T04:19:23.000Z" title="发表于 2022-11-04 12:19:23">2022-11-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/9wf3as.html" title="P2PSH"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-08.gif" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="P2PSH"/></a><div class="content"><a class="title" href="/posts/9wf3as.html" title="P2PSH">P2PSH</a><time datetime="2022-10-29T04:28:10.000Z" title="发表于 2022-10-29 12:28:10">2022-10-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/aav52a2.html" title="GIF (如同我这个标题图片)"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/./images/blog-07.gif" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GIF (如同我这个标题图片)"/></a><div class="content"><a class="title" href="/posts/aav52a2.html" title="GIF (如同我这个标题图片)">GIF (如同我这个标题图片)</a><time datetime="2022-10-27T02:08:10.000Z" title="发表于 2022-10-27 10:08:10">2022-10-27</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By 猗狛</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+  function butterfly_clock_anzhiyu_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock_anzhiyu')
+    if(parent_div_git) {
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var qweather_key = 'b16a1fa0e63c46a4b8f28abfb06ae3fe';
+  var gaud_map_key = 'e2b04289e870b005374ee030148d64fd&s=rsv3';
+  var baidu_ak_key = 'undefined';
+  var flag = 0;
+  var clock_rectangle = '119.28020,26.08020';
+  var clock_default_rectangle_enable = 'false';
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  </script><script src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script><script data-pjax src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.js"></script><script async src="/js/ali_font.js"></script><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/"});</script></body></html>
